@@ -29,6 +29,11 @@ If LOC RPC reads from the file to server address mapping and returns the address
 of the server which contains the file.
 
 RETR RPC begins to download the file.
+
+These are my implementations
+src/github.com/jlaffaye/ftp/myclient/client.go
+src/github.com/yob/graval/myserver/server.go
+
 --------------------------------------------------------------------------------
 Working
 --------------------------------------------------------------------------------
@@ -36,6 +41,8 @@ Working
 When a client requests for a file, a LOC RPC is sent to the server. LOC returns
 a server address. The second FTP request is RETR RPC to the server which
 contains the file. This request downloads the file.
+
+I modified the source code of the packages to develop additional features.
 
 --------------------------------------------------------------------------------
 Quick Peek of "fs" contents:
