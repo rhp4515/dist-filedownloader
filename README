@@ -1,1 +1,80 @@
-Distributed F/S
+--------------------------------------------------------------------------------
+Introduction
+--------------------------------------------------------------------------------
+I decided to use Golang to implement this project. I'd went through few
+tutorials before and decided to give it a go.
+
+I have used FTP Client implementation code by jlaffaye (ftp) and FTP server
+implementation code by Yob (gravel). These two packages were highly recommended
+for developing a FTP client server architecture.
+
+With the given time constraint, I've made a lot of assumptions to make a basic
+implementation. Typically, we might need to run a service which is responsible
+for maintaining this mapping between files and the address of the servers. I'm
+by-passing this by storing that information in a file that can be accessed by
+all the servers. This file is under the name "fs".
+
+Since I have developed this framework in local environment, my FTP servers run
+at localhost in different ports. Client sends a request to any server and
+retrieves the file correctly from the corresponding server.
+
+In most cases, the files are stored under a sub-directory located in the root
+directory in the servers, so my implementation assumes the files are stored in
+"/files/" directory.
+
+I also update the FTP to support a method called "LOC" (locate) which is
+responsible for getting the server in which the file is located.
+
+If LOC RPC reads from the file to server address mapping and returns the address
+of the server which contains the file.
+
+RETR RPC begins to download the file.
+--------------------------------------------------------------------------------
+Working
+--------------------------------------------------------------------------------
+
+When a client requests for a file, a LOC RPC is sent to the server. LOC returns
+a server address. The second FTP request is RETR RPC to the server which
+contains the file. This request downloads the file.
+
+--------------------------------------------------------------------------------
+Quick Peek of "fs" contents:
+--------------------------------------------------------------------------------
+
+/files/one.txt	3000
+/files/two.txt	3000
+/files/three.txt	3001
+/files/four.txt	3001
+/files/five.txt	3002
+/files/six.txt	3002
+/files/seven.txt	3003
+/files/eight.txt	3003
+
+--------------------------------------------------------------------------------
+Usage:
+--------------------------------------------------------------------------------
+Change directory to where you clone the code and set GOPATH to current working
+directory.
+
+export GOPATH=`pwd`
+
+go build src/github.com/jlaffaye/ftp/myclient/client.go
+go build src/github.com/yob/graval/myserver/server.go
+
+./server 3000
+./server 3001
+./server 3002
+./server 3003
+
+./client 3001 one.txt
+./client 3003 four.txt
+./client 3002 five.txt
+
+--------------------------------------------------------------------------------
+Future Work:
+--------------------------------------------------------------------------------
+
+Ideally, a central service has to be implemented for maintanence and updation of
+file names and server containing the file mapping.
+
+********************************************************************************

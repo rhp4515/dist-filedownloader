@@ -39,6 +39,7 @@ func retrieveFile(file string, serverID string) {
 		log.Fatal(err)
 	}
 }
+
 func main() {
 	serverID := "127.0.0.1:" + os.Args[1]
 	fname := "files/" + os.Args[2]
@@ -69,5 +70,4 @@ func main() {
 	// fmt.Println(string(buf))
 	serverID = "127.0.0.1:" + string(buf)
 	retrieveFile(os.Args[2], serverID)
-
 }

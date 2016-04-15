@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -13,10 +12,10 @@ import (
 	"github.com/yob/graval"
 )
 
-const (
+/*const (
 	fileOne = "This is the first file available for download.\n\nBy Jàmes"
 	fileTwo = "This is file number two.\n\n2012-12-04"
-)
+)*/
 
 type MemDriver struct {
 	fIndex map[string]string
@@ -37,21 +36,23 @@ func (driver *MemDriver) LoadFIndex() (err error) {
 	}
 	return nil
 }
+
 func (driver *MemDriver) Authenticate(user string, pass string) bool {
 	return user == "test" && pass == "1234"
 }
+
 func (driver *MemDriver) Bytes(path string) (bytes int) {
-	switch path {
-	case "/one.txt":
-		bytes = len(fileOne)
-		break
-	case "/files/two.txt":
-		bytes = len(fileTwo)
-		break
-	default:
-		bytes = -1
+	f, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return
+	defer f.Close()
+	fi, err := f.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// fmt.Println(fi.Size())
+	return int(fi.Size())
 }
 func (driver *MemDriver) ModifiedTime(path string) (time.Time, error) {
 	return time.Now(), nil
@@ -60,15 +61,16 @@ func (driver *MemDriver) ChangeDir(path string) bool {
 	return path == "/" || path == "/files"
 }
 func (driver *MemDriver) DirContents(path string) (files []os.FileInfo) {
-	files = []os.FileInfo{}
-	switch path {
-	case "/":
-		files = append(files, graval.NewDirItem("files"))
-		files = append(files, graval.NewFileItem("one.txt", len(fileOne)))
-	case "/files":
-		files = append(files, graval.NewFileItem("two.txt", len(fileOne)))
-	}
-	return files
+	// files = []os.FileInfo{}
+	// switch path {
+	// case "/":
+	// 	files = append(files, graval.NewDirItem("files"))
+	// 	files = append(files, graval.NewFileItem("one.txt", len(fileOne)))
+	// case "/files":
+	// 	files = append(files, graval.NewFileItem("two.txt", len(fileOne)))
+	// }
+	// return files
+	return nil
 }
 
 func (driver *MemDriver) DeleteDir(path string) bool {
@@ -84,7 +86,7 @@ func (driver *MemDriver) MakeDir(path string) bool {
 	return false
 }
 func (driver *MemDriver) GetFile(path string) (data string, err error) {
-	fmt.Println("getfile", path)
+	// fmt.Println("getfile", path)
 	fData, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
@@ -93,8 +95,8 @@ func (driver *MemDriver) GetFile(path string) (data string, err error) {
 }
 
 func (driver *MemDriver) LocateFile(path string) (port string) {
-	log.Println(path)
-	log.Printf("%+v", driver.fIndex)
+	// log.Println(path)
+	// log.Printf("%+v", driver.fIndex)
 	port, exist := driver.fIndex[path]
 	if !exist {
 		port = "-1"
